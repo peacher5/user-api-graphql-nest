@@ -15,5 +15,8 @@ export class User {
   lastName: string
 
   @Field(() => [User])
-  followers: User[]
+  followers: Set<number>
+
+  @Field(() => [User])
+  following: Set<number>
 }

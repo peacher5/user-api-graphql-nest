@@ -7,6 +7,8 @@ type User {
   email: String!
   firstName: String!
   lastName: String!
+  followers: [User!]!
+  following: [User!]!
 }
 
 type Query {
@@ -18,6 +20,7 @@ type Mutation {
   createUser(userData: CreateUserInput!): User!
   updateUser(userData: UpdateUserInput!, id: Int!): User!
   deleteUser(id: Int!): Boolean!
+  addFollower(followUserId: Int!, id: Int!): User!
 }
 
 input CreateUserInput {

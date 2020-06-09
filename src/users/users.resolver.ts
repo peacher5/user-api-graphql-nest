@@ -1,5 +1,6 @@
-import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql'
+import { Resolver, Query, Args, Int, Mutation, ResolveField, Parent } from '@nestjs/graphql'
 import { UserInputError } from 'apollo-server-express'
+
 import { User } from './models/user.model'
 import { UsersService } from './users.service'
 import { CreateUserInput } from './dto/create-user.input'
@@ -23,6 +24,18 @@ export class UsersResolver {
     }
   }
 
+  @ResolveField()
+  async followers(@Parent() user: User): Promise<User[]> {
+    const { id } = user
+    return this.userService.getFollowerList(id)
+  }
+
+  @ResolveField()
+  async following(@Parent() user: User): Promise<User[]> {
+    const { id } = user
+    return this.userService.getFollowingList(id)
+  }
+
   @Mutation(() => User)
   async createUser(@Args('userData') userData: CreateUserInput): Promise<User> {
     return this.userService.createUser(userData)
@@ -44,6 +57,18 @@ export class UsersResolver {
   async deleteUser(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
     try {
       return this.userService.deleteUser(id)
+    } catch (e) {
+      throw new UserInputError(e.message)
+    }
+  }
+
+  @Mutation(() => User)
+  async addFollower(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('followUserId', { type: () => Int }) followUserId: number
+  ): Promise<User> {
+    try {
+      return this.userService.addFollower(id, followUserId)
     } catch (e) {
       throw new UserInputError(e.message)
     }
